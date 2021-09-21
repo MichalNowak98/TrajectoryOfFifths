@@ -16,9 +16,13 @@ class PitchClass(Enum):
     B = 10
     E = 11
 
+    def angle(self):
+        return - ANGLE_BETWEEN_AXES * self.value + ANGLE_MARGIN
+
 
 # 30 degrees equals ~0.524 in radians
-ANGLE = pi / 6
+ANGLE_BETWEEN_AXES = pi / 6
+# added to angle to start from A note
 ANGLE_MARGIN = pi/2
 LABEL_MARGIN = 1.05
 
@@ -29,15 +33,15 @@ def calculate_unit_length(graph_size, margin, number_of_lines):
     return unit_length
 
 
-def count_coordinates(angle_multiplier, unit_length, value_multiplier):
-    angle = -ANGLE * angle_multiplier + ANGLE_MARGIN
-    return sin(angle) * unit_length * value_multiplier, cos(angle) * unit_length * value_multiplier
+def count_coordinates(angle, unit_length, value_multiplier):
+    return (sin(angle) * unit_length * value_multiplier,
+            cos(angle) * unit_length * value_multiplier)
 
 
 def generate_graph(graph, graph_size, margin, unit_length, number_of_lines):
     # lines and legend
     for pitch_class in PitchClass:
-        x, y = count_coordinates(pitch_class.value, unit_length, number_of_lines)
+        x, y = count_coordinates(pitch_class.angle(), unit_length, number_of_lines)
         graph.draw_text(pitch_class.name, (x * LABEL_MARGIN, y * LABEL_MARGIN))
         graph.draw_line((0, 0), (x, y), color='grey70')
     # circles
@@ -50,7 +54,7 @@ def generate_music_signature_graph(graph, graph_size, margin, point_table):
     generate_graph(graph, graph_size, margin, unit_length, 1)
     # points
     for pitch_class in PitchClass:
-        x, y = count_coordinates(pitch_class.value, unit_length, point_table[pitch_class.value])
+        x, y = count_coordinates(pitch_class.angle(), unit_length, point_table[pitch_class.value])
         graph.draw_point((x, y), 5, color='green')
         graph.draw_line((0, 0), (x, y), color='green')
 
