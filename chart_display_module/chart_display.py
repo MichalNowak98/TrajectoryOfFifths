@@ -1,4 +1,4 @@
-from math import sin, cos, pi
+from math import sin, cos, pi, ceil
 from enum import Enum
 
 
@@ -17,13 +17,11 @@ class PitchClass(Enum):
     E = 11
 
     def angle(self):
-        return - ANGLE_BETWEEN_AXES * self.value + ANGLE_MARGIN
+        return ANGLE_BETWEEN_AXES * self.value
 
 
 # 30 degrees equals ~0.524 in radians
 ANGLE_BETWEEN_AXES = pi / 6
-# added to angle to start from A note
-ANGLE_MARGIN = pi/2
 LABEL_MARGIN = 1.05
 
 
@@ -34,8 +32,17 @@ def calculate_unit_length(graph_size, margin, number_of_lines):
 
 
 def count_coordinates(angle, unit_length, value_multiplier):
-    return (sin(angle) * unit_length * value_multiplier,
-            cos(angle) * unit_length * value_multiplier)
+    return (cos(angle) * unit_length * value_multiplier,
+            sin(angle) * unit_length * value_multiplier)
+
+
+def calculate_cpms(point_table):
+    x = 0
+    y = 0
+    for pitch_class in PitchClass:
+        x += point_table[pitch_class.value] * cos(pitch_class.angle())
+        y += point_table[pitch_class.value] * sin(pitch_class.angle())
+    return x, y
 
 
 def generate_graph(graph, graph_size, margin, unit_length, number_of_lines):
@@ -50,13 +57,22 @@ def generate_graph(graph, graph_size, margin, unit_length, number_of_lines):
 
 
 def generate_music_signature_graph(graph, graph_size, margin, point_table):
-    unit_length = calculate_unit_length(graph_size, margin, 1)
-    generate_graph(graph, graph_size, margin, unit_length, 1)
-    # points
+    x, y = calculate_cpms(point_table)
+    max_line_index = ceil(max(x, y))
+
+    unit_length = calculate_unit_length(graph_size, margin, max_line_index)
+    generate_graph(graph, graph_size, margin, unit_length, max_line_index)
+
+    # CMPS point
+    graph.draw_point((x * unit_length, y * unit_length), 10, color='red')
+    graph.draw_text("CPMS", (x * unit_length * LABEL_MARGIN, y * unit_length * LABEL_MARGIN), color='red')
+
+    # vectors
     for pitch_class in PitchClass:
         x, y = count_coordinates(pitch_class.angle(), unit_length, point_table[pitch_class.value])
-        graph.draw_point((x, y), 5, color='green')
-        graph.draw_line((0, 0), (x, y), color='green')
+        graph.draw_point((x, y), 7, color='blue')
+        graph.draw_line((0, 0), (x, y), color='blue')
+
 
 
 def generate_trajectory_of_fifths_graph(graph, graph_size, margin, point_table, number_of_lines):
