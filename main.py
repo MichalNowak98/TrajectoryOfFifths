@@ -1,6 +1,7 @@
-from midi_module.midi_analyzer import open_midi_file
+from midi_module.midi_analyzer import get_cpms_array
 
-PARTS = 32
+NUMBER_OF_CHUNKS = 32
+
 
 if __name__ == '__main__':
-    open_midi_file('../../../Download/Yellow Submarine.mid')
+    cpms = get_cpms_array('../../../Download/C G am F.mid', NUMBER_OF_CHUNKS)
