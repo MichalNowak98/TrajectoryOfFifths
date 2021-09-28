@@ -36,28 +36,29 @@ def calculate_cpms(point_table):
     return x, y
 
 
-def calculate_cpms_for_note_class_array(note_class_array):
+def calculate_cpms_for_note_class_array(note_class_durations):
     x = 0
     y = 0
     for pitch_class in PitchClass:
-        x += note_class_array[pitch_class.name] * cos(pitch_class.angle())
-        y += note_class_array[pitch_class.name] * sin(pitch_class.angle())
+        x += note_class_durations[pitch_class.name] * cos(pitch_class.angle())
+        y += note_class_durations[pitch_class.name] * sin(pitch_class.angle())
     return x, y
 
 
-def calculate_cpms_array(note_class_arrays):
+def calculate_cpms_array(note_class_duration_array):
     cpms_array = []
-    for note_class_array in note_class_arrays:
-        note_class_array = normalize_note_class_array(note_class_array)
-        cpms_array.append(calculate_cpms_for_note_class_array(note_class_array))
+    for note_class_durations in note_class_duration_array:
+        note_class_durations = normalize_note_class_array(note_class_durations)
+        cpms_array.append(calculate_cpms_for_note_class_array(note_class_durations))
     return cpms_array
 
 
-def normalize_note_class_array(note_class_array):
-    max_val = note_class_array[max(note_class_array, key=note_class_array.get)]
-    for note_class in note_class_array:
-        note_class_array[note_class] = note_class_array[note_class] / max_val
-    return note_class_array
+def normalize_note_class_array(note_class_durations):
+    max_val = note_class_durations[max(note_class_durations, key=note_class_durations.get)]
+    if max_val > 0:
+        for note_class in note_class_durations:
+            note_class_durations[note_class] = note_class_durations[note_class] / max_val
+    return note_class_durations
 
 
 def get_note_class(note):
