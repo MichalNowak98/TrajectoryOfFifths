@@ -4,13 +4,24 @@ import csv
 from locale import atof, setlocale, LC_NUMERIC
 setlocale(LC_NUMERIC, 'French_Canada.1252')
 
-def get_cpms_array(name, number_of_chunks):
-    mid = MidiFile(name, clip=True)
-    print(mid)
-    note_time_segments_array, time = get_note_time_segments_array_and_time(mid)
-    note_class_duration_array = get_note_class_duration_array(note_time_segments_array, time, number_of_chunks)
+
+def get_cpms_array(note_time_segments_array, time_per_chunk, number_of_chunks):
+    note_class_duration_array = get_note_class_duration_array(note_time_segments_array, time_per_chunk, number_of_chunks)
     cpms_array = calculate_cpms_array(note_class_duration_array)
     return cpms_array
+
+
+def get_cpms_array_quarter_notes(name, number_of_chunks):
+    mid = MidiFile(name, clip=True)
+    note_time_segments_array, time  = get_note_time_segments_array_and_time(mid)
+    return get_cpms_array(note_time_segments_array, mid.ticks_per_beat, number_of_chunks)
+
+
+def get_cpms_array_whole_file(name, number_of_chunks):
+    mid = MidiFile(name, clip=True)
+    note_time_segments_array, time = get_note_time_segments_array_and_time(mid)
+    time_per_chunk = float(time) / number_of_chunks
+    return get_cpms_array(note_time_segments_array, time_per_chunk, number_of_chunks)
 
 
 def get_cpms_array_from_csv(name):
@@ -51,9 +62,9 @@ def get_note_time_segments_array_and_time(mid):
     return note_time_segments_array, time
 
 
-def get_note_class_duration_array(note_time_segments_array, time, n):
+def get_note_class_duration_array(note_time_segments_array, time_per_chunk, n):
     note_class_duration_array = []
-    time_per_chunk = float(time) / n
+    time_per_chunk = time_per_chunk
     for chunk_index in range(n):
         note_class_duration_array.append({
             "A": 0, "D": 0, "G": 0, "C": 0, "F": 0, "Bb": 0, "Eb": 0, "Ab": 0, "Db": 0, "Gb": 0, "B": 0, "E": 0
@@ -61,7 +72,6 @@ def get_note_class_duration_array(note_time_segments_array, time, n):
         chunk_time_range = (chunk_index * time_per_chunk, (chunk_index + 1) * time_per_chunk)
         for note_class in note_time_segments_array:
             for time_segment in note_time_segments_array[note_class]:
-                x = note_class_duration_array[chunk_index][note_class]
                 note_class_duration_array[chunk_index][note_class] = note_class_duration_array[chunk_index][note_class] + calculate_note_duration_in_chunk(time_segment, chunk_time_range)
     return note_class_duration_array
 

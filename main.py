@@ -1,6 +1,6 @@
 from chart_display_module.chart_display import generate_trajectory_of_fifths_graph, generate_music_signature_graph
 import PySimpleGUI as sg
-from midi_module.midi_analyzer import get_cpms_array, get_cpms_array_from_csv
+from midi_module.midi_analyzer import get_cpms_array_whole_file, get_cpms_array_quarter_notes, get_cpms_array_from_csv
 
 NUMBER_OF_CHUNKS = 32
 GRAPH_SIZE = 700
@@ -17,7 +17,7 @@ TRAJECTORY_TEST_ARRAYS = [
 ]
 
 if __name__ == '__main__':
-    cpms = get_cpms_array('../../../Download/I_Prelude2_4.mid', NUMBER_OF_CHUNKS)
+    cpms = get_cpms_array_quarter_notes('../../../Download/I_Prelude2_4.mid', NUMBER_OF_CHUNKS)
     #cpms = get_cpms_array_from_csv('../../../Download/I_Prelude2_4_quarter_note_from-0-to-32_Trajektoria.csv')
 
     layout = [[sg.Graph(canvas_size=(GRAPH_SIZE, GRAPH_SIZE), graph_bottom_left=(-GRAPH_SIZE, -GRAPH_SIZE),
