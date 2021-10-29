@@ -44,13 +44,14 @@ def get_note_time_segments_array_and_time(mid):
     for i, track in enumerate(mid.tracks):
         print('Track {}: {}'.format(i, track.name))
         first_note_on_msg = True
+        time = 0
         for msg in track:
             time += msg.time
             if msg.type == 'note_on' and msg.velocity > 0:
                 # time before first note_on is not important
                 if first_note_on_msg:
-                    notes_on.append({"note": msg.note, "channel": msg.channel, "time": 0})
-                    time = 0
+                    notes_on.append({"note": msg.note, "channel": msg.channel, "time": msg.time})
+                    time = msg.time
                     first_note_on_msg = False
                 else:
                     notes_on.append({"note": msg.note, "channel": msg.channel, "time": time})
