@@ -6,12 +6,13 @@ from layouts import ComparisonGraphLayout, GraphLayout
 
 NUMBER_OF_CHUNKS = 32
 GRAPH_SIZE = 700
-MARGIN = 50
+MARGIN = 75
 GRAPH_MIDDLE = GRAPH_SIZE / 2
 SIGNATURE_TEST_ARRAYS = [
     #[A D G C F Bb Es As Ds Gs B E]
     [0.06, 0.5, 1, 0.96, 0.37, 0.06, 0.61, 0.49, 0.21, 0.1, 0.23, 0.1],
     [0, 0, 0.67, 1, 0, 0, 0.33, 0, 0, 0, 0, 0],
+    [0, 0, 0.5, 1, 0, 0, 0.5, 0, 0, 0, 0, 0],
     [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
     [1, 0.5, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 1/3, 2/3, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -22,12 +23,13 @@ SIGNATURE_TEST_ARRAYS = [
 TRAJECTORY_TEST_ARRAYS = [
     [(0.32, 1), (-1.12, -1.09), (0.11, 2.1), (1, -3.1)]
 ]
+CHOSEN_INDEX = 2
 
 
 def show_music_signature():
     graph_layout = GraphLayout(GRAPH_SIZE)
     window = PySimpleGUI.Window('Characteristic point of music signature', graph_layout.layout, finalize=True)
-    generate_music_signature_graph(window[graph_layout.GRAPH_KEY], GRAPH_SIZE, MARGIN, SIGNATURE_TEST_ARRAYS[7])
+    generate_music_signature_graph(window[graph_layout.GRAPH_KEY], GRAPH_SIZE, MARGIN, SIGNATURE_TEST_ARRAYS[CHOSEN_INDEX])
     sustain_window(window)
 
 
@@ -64,7 +66,8 @@ def sustain_window(window):
 
 
 if __name__ == '__main__':
-    show_music_signature()
+    #show_music_signature()
+    show_trajectory_of_fifths()
 
 
 
