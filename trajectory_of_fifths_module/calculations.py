@@ -5,13 +5,13 @@ from enum import Enum
 ANGLE_BETWEEN_AXES = pi / 6
 
 MIDI_NOTE_CLASS = {
-    0: "C", 1: "Db", 2: "D", 3: "Eb", 4: "E", 5: "F", 6: "Gb", 7: "G", 8: "Ab", 9: "A", 10: "Bb", 11: "B"
+    0: "C", 1: "D♭", 2: "D", 3: "E♭", 4: "E", 5: "F", 6: "G♭", 7: "G", 8: "A♭", 9: "A", 10: "B♭", 11: "B"
 }
 CIRCLE_DUR_LABELS = [
-    "A", "D", "G", "C", "F", "Bb", "Eb", "Ab", "Db", "Gb/F#", "B", "E"
+    "A", "D", "G", "C", "F", "B♭", "E♭", "A♭", "D♭", "G♭/F#", "B", "E"
 ]
 CIRCLE_MOLL_LABELS = [
-    "f#", "b", "e", "a", "d", "g", "c", "f", "bb", "eb/d#", "g#", "c#"
+    "f#", "b", "e", "a", "d", "g", "c", "f", "b♭", "e♭/d#", "g#", "c#"
 ]
 
 
@@ -97,7 +97,7 @@ def find_main_axis_signature(note_class_durations):
 
 
 def find_main_axis_trajectory(cpms_table):
-    main_axe = [0,0]
+    main_axe = [0, 0]
     for pitch_class in PitchClass:
         axis = directed_axis_value_trajectory(pitch_class, cpms_table)
         if axis > main_axe[0]:
