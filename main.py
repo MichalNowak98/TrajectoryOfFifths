@@ -2,16 +2,20 @@ from chart_display_module.chart_display import generate_trajectory_of_fifths_gra
     generate_music_signature_graph_for_note_class_durations, \
     generate_music_signature_graph_for_note_class_durations_with_directed_axis
 import PySimpleGUI
-from midi_module.midi_analyzer import get_cpms_array_whole_file, get_cpms_array_quarter_notes, get_cpms_array_from_csv
+from midi_module.midi_analyzer import get_cpms_array_whole_file, get_cpms_array_quarter_notes, get_cpms_array_from_csv,\
+    get_note_time_segments_array_quarter_notes
 from layouts import ComparisonGraphLayout, GraphLayout
 
 
 NUMBER_OF_CHUNKS = 32
-GRAPH_SIZE = 700
-MARGIN = 75
+GRAPH_SIZE = 900
+MARGIN = 250
 GRAPH_MIDDLE = GRAPH_SIZE / 2
 SIGNATURE_TEST_ARRAYS = [
     #[A D G C F Bb Es As Ds Gs B E]
+    ###################
+    ## first example ##
+    ###################
     [0, 0, 2/7, 0, 0, 0, 0, 0, 0, 0, 2/7, 1], #0
     [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
     [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
@@ -25,15 +29,50 @@ SIGNATURE_TEST_ARRAYS = [
     [0, 0, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0.5],
     [0.5, 0, 0, 1, 0.5, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 1/5, 2/5, 1, 0, 0, 4/5, 0, 0, 0], #12
-    #[A D G C F Bb Es As Ds Gs B E]
+    ##########################
+    ## nothing else matters ##
+    ##########################
     [0, 0, 6/7, 0, 0, 0, 0, 0, 0, 0, 1, 5/7],
     [1/8, 1, 1/8, 1, 0, 0, 0, 0, 0, 1/8, 0, 1/8],
     [0, 1/10, 7/10, 0, 0, 0, 1/10, 0, 0, 1/10, 1, 0], #15
     [0, 0, 2/7, 0, 0, 0, 0, 0, 0, 0, 2/7, 1],
+    ####################
+    ## Always with me ##
+    ####################
+    [0, 0, 0, 0, 0, 0, 2/8, 0, 0, 0, 1, 1/8],
+    [0, 0, 0, 0, 0, 0, 0, 2/7, 0, 0, 2/7, 1],#18
+    [0, 0, 0, 0, 0, 0, 0, 0, 1/8, 1, 2/8, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 1/6, 2/6, 2/6, 0],
+    [0, 0, 0, 0, 0, 0, 1/6, 2/6, 2/6, 0, 0, 1],#21
+    [0, 0, 0, 0, 0, 0, 0, 0, 1/8, 1, 2/8, 0],
+    [0, 0, 0, 0, 0, 2/8, 0, 0, 1/8, 1, 2/8, 0],
+    ########################
+    ## prelude suite no.1 ##
+    ########################
+    #[A D G C F Bb Es As Ds Gs B E]
+    [1, 1/3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1/3],#24
+    [0, 1/3, 1, 0, 0, 0, 0, 0, 0, 1/3, 1, 0],
+    [0, 1/3, 1, 0, 0, 0, 0, 0, 1, 1/3, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0, 1/7, 6/7, 0, 2/7], #27
+    #####################
+    ## prelude d major ##
+    #####################
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 1/3, 0, 1/3], #28
+    [1/3, 1, 0, 0, 0, 0, 0, 0, 0, 1/3, 0, 1/3],
+    [1/3, 1/3, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1/3], #30
+    [1/3, 1, 0, 0, 0, 0, 0, 0, 0, 1/3, 0, 1/3],
+    [0, 0, 2/3, 0, 0, 0, 0, 0, 0, 1/3, 0, 1],
+    [0, 1, 0, 0, 0, 0, 0, 0, 1/3, 0, 2/3, 0], #33
+    [1, 0, 1/2, 0, 0, 0, 0, 0, 1/2, 1/2, 0, 1/2],
+    [1/2, 0, 1/2, 0, 0, 0, 0, 0, 1, 1/2, 0, 1/2],
 ]
 TRAJECTORY_TEST_ARRAYS = [
+    ##########################
+    ## nothing else matters ##
+    ##########################
     [(0.32, 1), (-1.12, -1.09), (0.11, 2.1), (1, -3.1)],
-    [(1.55, -0.48), (1.16, 1.42), (0.84, -0.31), (1.15, -0.50)]
+    [(1.55, -0.48), (1.16, 1.42), (0.84, -0.31), (1.15, -0.50)],
+    [(1.15,0),(1.47,0),(0.91,-1),(1.47,0),(1.20,-0.26),(1.03,-0.37),(1.43,-0.75),(0.68,-1.18),]
 ]
 PATHS = [
     'd:/Studia/Magisterka/Trajektorie/MIDI/',
@@ -43,7 +82,7 @@ TRACKS = [
     "I_Prelude2_4",
     "Metallica - Nothing Else Matters"
 ]
-CHOSEN_INDEX = 15
+CHOSEN_INDEX = 28
 
 
 def show_music_signature():
@@ -78,8 +117,8 @@ def show_trajectory_of_fifths_for_array(array):
 def show_cpms_of_trajectory(path, index):
     graph_layout = GraphLayout(GRAPH_SIZE)
     window = PySimpleGUI.Window('Comparison of trajectories of fifths', graph_layout.layout, finalize=True)
-    midi_cpms = get_cpms_array_quarter_notes(path, NUMBER_OF_CHUNKS)
-    generate_music_signature_graph_for_note_class_durations(window[graph_layout.GRAPH_KEY], GRAPH_SIZE, MARGIN, midi_cpms[index])
+    note_time_segments = get_note_time_segments_array_quarter_notes(path, NUMBER_OF_CHUNKS)
+    generate_music_signature_graph_for_note_class_durations(window[graph_layout.GRAPH_KEY], GRAPH_SIZE, MARGIN, note_time_segments[index])
     sustain_window(window)
 
 
@@ -105,9 +144,9 @@ def sustain_window(window):
 
 
 if __name__ == '__main__':
-    show_trajectory_of_fifths_for_array(TRAJECTORY_TEST_ARRAYS[1])
+    #show_trajectory_of_fifths_for_array(TRAJECTORY_TEST_ARRAYS[1])
     #show_music_signature()
-    #show_music_signature_with_directed_axis()
-    #show_trajectory_of_fifths(PATHS[1] + TRACKS[1] + ".mid")
+    show_music_signature_with_directed_axis()
+    #show_trajectory_of_fifths(PATHS[0] + TRACKS[0] + ".mid")
     #show_cpms_of_trajectory(PATHS[1] + TRACKS[1] + ".mid", 1)
     #show_comparison_of_trajectories()

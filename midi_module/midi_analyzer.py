@@ -18,6 +18,14 @@ def get_cpms_array_quarter_notes(name, number_of_chunks):
     return get_cpms_array(note_time_segments_array, mid.ticks_per_beat, number_of_chunks)
 
 
+def get_note_time_segments_array_quarter_notes(name, number_of_chunks):
+    mid = MidiFile(name, clip=True)
+    print(mid)
+    note_time_segments_array, time = get_note_time_segments_array_and_time(mid)
+    note_class_duration_array = get_note_class_duration_array(note_time_segments_array, mid.ticks_per_beat, number_of_chunks)
+    return note_class_duration_array
+
+
 def get_cpms_array_whole_file(name, number_of_chunks):
     mid = MidiFile(name, clip=True)
     note_time_segments_array, time = get_note_time_segments_array_and_time(mid)

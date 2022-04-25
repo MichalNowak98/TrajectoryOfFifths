@@ -3,15 +3,15 @@ from enum import Enum
 
 # 30 degrees equals ~0.524 in radians
 ANGLE_BETWEEN_AXES = pi / 6
-
+#♭
 MIDI_NOTE_CLASS = {
-    0: "C", 1: "D♭", 2: "D", 3: "E♭", 4: "E", 5: "F", 6: "G♭", 7: "G", 8: "A♭", 9: "A", 10: "B♭", 11: "B"
+    0: "C", 1: "Db", 2: "D", 3: "Eb", 4: "E", 5: "F", 6: "Gb", 7: "G", 8: "Ab", 9: "A", 10: "Bb", 11: "B"
 }
 CIRCLE_DUR_LABELS = [
-    "A", "D", "G", "C", "F", "B♭", "E♭", "A♭", "D♭", "G♭/F#", "B", "E"
+    "A", "D", "G", "C", "F", "Bb", "Eb", "Ab", "Db", "Gb/F#", "B", "E"
 ]
 CIRCLE_MOLL_LABELS = [
-    "f#", "b", "e", "a", "d", "g", "c", "f", "b♭", "e♭/d#", "g#", "c#"
+    "f#", "b", "e", "a", "d", "g", "c", "f", "bb", "eb/d#", "g#", "c#"
 ]
 
 
@@ -53,6 +53,8 @@ def calculate_cpms(point_table):
 
 
 def calculate_coordinates(point_table, pitch_class):
+    # x = point_table[pitch_class.name] * cos(pitch_class.angle())
+    # y = point_table[pitch_class.name] * sin(pitch_class.angle())
     x = point_table[pitch_class.value] * cos(pitch_class.angle())
     y = point_table[pitch_class.value] * sin(pitch_class.angle())
     return x, y
