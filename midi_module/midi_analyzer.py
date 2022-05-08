@@ -72,10 +72,10 @@ def get_note_time_segments_array_and_time(mid):
     return note_time_segments_array, time
 
 
-def get_note_class_duration_array(note_time_segments_array, time_per_chunk, n):
+def get_note_class_duration_array(note_time_segments_array, time_per_chunk, number_of_chunks):
     note_class_duration_array = []
     time_per_chunk = time_per_chunk
-    for chunk_index in range(n):
+    for chunk_index in range(number_of_chunks):
         note_class_duration_array.append({
             "A": 0, "D": 0, "G": 0, "C": 0, "F": 0, "Bb": 0, "Eb": 0, "Ab": 0, "Db": 0, "Gb": 0, "B": 0, "E": 0
         })

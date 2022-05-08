@@ -13,7 +13,7 @@ POINT_DIAMETER = 30
 FONT = ("Arial", 30)
 
 
-def generate_graph(graph, graph_size, margin, unit_length, number_of_lines):
+def generate_graph(graph, unit_length, number_of_lines):
     # lines and legend
     for pitch_class in PitchClass:
         x, y = calculate_coordinates(pitch_class.angle(), unit_length, number_of_lines)
@@ -25,7 +25,7 @@ def generate_graph(graph, graph_size, margin, unit_length, number_of_lines):
         graph.draw_text(i + 1, (unit_length * (i + 1) * LABEL_MARGIN, -50), color='grey40', font=FONT)
 
 
-def generate_music_signature_graph_with_directed_axis(graph, graph_size, margin, note_class_durations):
+def generate_music_signature_graph_for_note_class_durations_with_directed_axis(graph, graph_size, margin, note_class_durations):
     generate_music_signature_graph_for_note_class_durations(graph, graph_size, margin, note_class_durations)
     main_axis_pitch_class = find_main_axis_signature(note_class_durations)
     x, y = calculate_cpms(note_class_durations)
@@ -34,16 +34,6 @@ def generate_music_signature_graph_with_directed_axis(graph, graph_size, margin,
     draw_main_directed_axis(graph, main_axis_pitch_class, unit_length, max_line_index)
     draw_mode_axis(graph, main_axis_pitch_class, unit_length, max_line_index)
 
-
-def generate_music_signature_graph_for_note_class_durations_with_directed_axis(graph, graph_size, margin,
-                                                                               note_class_durations):
-    generate_music_signature_graph_for_note_class_durations(graph, graph_size, margin, note_class_durations)
-    main_axis_pitch_class = find_main_axis_signature(note_class_durations)
-    x, y = calculate_cpms(note_class_durations)
-    max_line_index = calculate_max_line_index([(x, y)])
-    unit_length = calculate_unit_length(graph_size, margin, max_line_index)
-    draw_main_directed_axis(graph, main_axis_pitch_class, unit_length, max_line_index)
-    draw_mode_axis(graph, main_axis_pitch_class, unit_length, max_line_index)
 
 
 def generate_music_signature_graph_for_note_class_durations(graph, graph_size, margin, note_class_durations):
@@ -72,7 +62,7 @@ def generate_music_signature_graph_for_point(graph, graph_size, margin, point):
     max_line_index = calculate_max_line_index([(x, y)])
 
     unit_length = calculate_unit_length(graph_size, margin, max_line_index)
-    generate_graph(graph, graph_size, margin, unit_length, max_line_index)
+    generate_graph(graph, unit_length, max_line_index)
 
     # CPMS point
     graph.draw_point((x * unit_length, y * unit_length), 10, color='red')
@@ -89,7 +79,7 @@ def generate_music_signature_graph_for_point(graph, graph_size, margin, point):
 def generate_trajectory_of_fifths_graph_with_directed_axis(graph, graph_size, margin, cpms_table):
     max_line_index = calculate_max_line_index(cpms_table)
     unit_length = calculate_unit_length(graph_size, margin, max_line_index)
-    generate_graph(graph, graph_size, margin, unit_length, max_line_index)
+    generate_graph(graph, unit_length, max_line_index)
     main_axis_pitch_class = find_main_axis_trajectory(cpms_table)
     draw_main_directed_axis(graph, main_axis_pitch_class, unit_length, max_line_index)
     draw_mode_axis(graph, main_axis_pitch_class, unit_length, max_line_index)
@@ -98,7 +88,7 @@ def generate_trajectory_of_fifths_graph_with_directed_axis(graph, graph_size, ma
 def generate_trajectory_of_fifths_graph(graph, graph_size, margin, cpms_table):
     max_line_index = calculate_max_line_index(cpms_table)
     unit_length = calculate_unit_length(graph_size, margin, max_line_index)
-    generate_graph(graph, graph_size, margin, unit_length, max_line_index)
+    generate_graph(graph, unit_length, max_line_index)
 
     # points and lines between them
     for point in range(len(cpms_table)):
@@ -141,12 +131,12 @@ def draw_caret(graph, main_axis_pitch_class, unit_length, number_of_lines, x, y,
     graph.draw_line((x2, y2), (x, y), color=color, width=VECTORS_WIDTH)
 
 
-def draw_dashed_line(graph, x1, y1, x2, y2, number_of_points, color):
-    for i in range(0, number_of_points, 2):
-        graph.draw_line((x1 / number_of_points * i, y1 / number_of_points * i),
-                        (x1 / number_of_points * (i + 1), y1 / number_of_points * (i + 1)), color=color, width=VECTORS_WIDTH)
-        graph.draw_line((x2 / number_of_points * i, y2 / number_of_points * i),
-                        (x2 / number_of_points * (i + 1), y2 / number_of_points * (i + 1)), color=color, width=VECTORS_WIDTH)
+def draw_dashed_line(graph, x1, y1, x2, y2, number_of_dashes, color):
+    for i in range(0, number_of_dashes, 2):
+        graph.draw_line((x1 / number_of_dashes * i, y1 / number_of_dashes * i),
+                        (x1 / number_of_dashes * (i + 1), y1 / number_of_dashes * (i + 1)), color=color, width=VECTORS_WIDTH)
+        graph.draw_line((x2 / number_of_dashes * i, y2 / number_of_dashes * i),
+                        (x2 / number_of_dashes * (i + 1), y2 / number_of_dashes * (i + 1)), color=color, width=VECTORS_WIDTH)
 
 
 def draw_mode_axis(graph, main_axis_pitch_class, unit_length, number_of_lines):

@@ -55,6 +55,7 @@ def calculate_cpms(point_table):
 def calculate_coordinates(point_table, pitch_class):
     # x = point_table[pitch_class.name] * cos(pitch_class.angle())
     # y = point_table[pitch_class.name] * sin(pitch_class.angle())
+
     x = point_table[pitch_class.value] * cos(pitch_class.angle())
     y = point_table[pitch_class.value] * sin(pitch_class.angle())
     return x, y
@@ -106,7 +107,7 @@ def find_main_axis_trajectory(cpms_table):
             main_axe = [axis, pitch_class]
     return main_axe[1]
 
-
+#TODO refactor - based on signatures, not cpms
 def directed_axis_value_trajectory(pitch_class, cpms_table):
     class_angle = pitch_class.angle()
     value = 0

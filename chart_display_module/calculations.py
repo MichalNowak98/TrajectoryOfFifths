@@ -1,5 +1,4 @@
 from math import sin, cos, pi, ceil, sqrt, pow
-from enum import Enum
 
 
 def calculate_line_length(starting_point, ending_point):
