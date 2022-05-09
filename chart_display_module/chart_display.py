@@ -38,10 +38,10 @@ def generate_music_signature_graph_for_note_class_durations_with_directed_axis(g
 
 def generate_music_signature_graph_for_note_class_durations(graph, graph_size, margin, note_class_durations):
     x, y = calculate_cpms(note_class_durations)
-    max_line_index = 2
+    max_line_index = calculate_max_line_index([(x, y)])
 
     unit_length = calculate_unit_length(graph_size, margin, max_line_index)
-    generate_graph(graph, graph_size, margin, unit_length, max_line_index)
+    generate_graph(graph, unit_length, max_line_index)
 
     # CPMS point
     graph.draw_point((x * unit_length, y * unit_length), POINT_DIAMETER, color='red')
@@ -119,13 +119,11 @@ def draw_main_axis_label(graph, pitch_class, unit_length, number_of_lines):
 def draw_caret(graph, main_axis_pitch_class, unit_length, number_of_lines, x, y, color):
     line_length = calculate_line_length([0, 0], [x, y])
     caret_line_angle_diff = 0.025 * (unit_length * number_of_lines / line_length)
-    if number_of_lines > 1:
-        number_of_lines = number_of_lines - 1
     x1, y1 = calculate_coordinates(
-        main_axis_pitch_class.angle() + caret_line_angle_diff, number_of_lines - 1 + line_length - 30, number_of_lines
+        main_axis_pitch_class.angle() + caret_line_angle_diff, line_length - 30, 1
     )
     x2, y2 = calculate_coordinates(
-        main_axis_pitch_class.angle() - caret_line_angle_diff, number_of_lines - 1 + line_length - 30, number_of_lines
+        main_axis_pitch_class.angle() - caret_line_angle_diff, line_length - 30, 1
     )
     graph.draw_line((x1, y1), (x, y), color=color, width=VECTORS_WIDTH)
     graph.draw_line((x2, y2), (x, y), color=color, width=VECTORS_WIDTH)

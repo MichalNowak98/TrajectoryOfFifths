@@ -5,7 +5,6 @@ import PySimpleGUI
 from midi_module.midi_analyzer import get_cpms_array_whole_file, get_cpms_array_quarter_notes, get_cpms_array_from_csv,\
     get_note_time_segments_array_quarter_notes
 from layouts import ComparisonGraphLayout, GraphLayout
-from gui_module.gui import run_gui
 
 
 NUMBER_OF_CHUNKS = 32
@@ -83,7 +82,7 @@ TRACKS = [
     "I_Prelude2_4",
     "Metallica - Nothing Else Matters"
 ]
-CHOSEN_INDEX = 28
+CHOSEN_INDEX = 15
 
 
 def show_music_signature():
@@ -145,10 +144,9 @@ def sustain_window(window):
 
 
 if __name__ == '__main__':
-    run_gui()
-    #show_trajectory_of_fifths_for_array(TRAJECTORY_TEST_ARRAYS[1])
     #show_music_signature()
-    #show_music_signature_with_directed_axis()
+    #show_trajectory_of_fifths_for_array(TRAJECTORY_TEST_ARRAYS[1])
+    show_music_signature_with_directed_axis()
     #show_trajectory_of_fifths(PATHS[0] + TRACKS[0] + ".mid")
     #show_cpms_of_trajectory(PATHS[1] + TRACKS[1] + ".mid", 1)
     #show_comparison_of_trajectories()
