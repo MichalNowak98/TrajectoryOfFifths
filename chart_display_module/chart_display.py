@@ -12,6 +12,8 @@ VECTORS_WIDTH = 5
 POINT_DIAMETER = 30
 FONT = ("Arial", 30)
 
+MAX_NUMBER_OF_LINES = 0
+
 
 def generate_graph(graph, unit_length, number_of_lines):
     # lines and legend
@@ -29,7 +31,7 @@ def generate_music_signature_graph_for_note_class_durations_with_directed_axis(g
     generate_music_signature_graph_for_note_class_durations(graph, graph_size, margin, note_class_durations)
     main_axis_pitch_class = find_main_axis_signature(note_class_durations)
     x, y = calculate_cpms(note_class_durations)
-    max_line_index = calculate_max_line_index([(x, y)])
+    max_line_index = calculate_max_line_index([(x, y)]) if MAX_NUMBER_OF_LINES == 0 else MAX_NUMBER_OF_LINES
     unit_length = calculate_unit_length(graph_size, margin, max_line_index)
     draw_main_directed_axis(graph, main_axis_pitch_class, unit_length, max_line_index)
     draw_mode_axis(graph, main_axis_pitch_class, unit_length, max_line_index)
@@ -38,7 +40,7 @@ def generate_music_signature_graph_for_note_class_durations_with_directed_axis(g
 
 def generate_music_signature_graph_for_note_class_durations(graph, graph_size, margin, note_class_durations):
     x, y = calculate_cpms(note_class_durations)
-    max_line_index = calculate_max_line_index([(x, y)])
+    max_line_index = calculate_max_line_index([(x, y)]) if MAX_NUMBER_OF_LINES == 0 else MAX_NUMBER_OF_LINES
 
     unit_length = calculate_unit_length(graph_size, margin, max_line_index)
     generate_graph(graph, unit_length, max_line_index)
@@ -59,7 +61,7 @@ def generate_music_signature_graph_for_note_class_durations(graph, graph_size, m
 
 def generate_music_signature_graph_for_point(graph, graph_size, margin, point):
     x, y = point
-    max_line_index = calculate_max_line_index([(x, y)])
+    max_line_index = calculate_max_line_index([(x, y)]) if MAX_NUMBER_OF_LINES == 0 else MAX_NUMBER_OF_LINES
 
     unit_length = calculate_unit_length(graph_size, margin, max_line_index)
     generate_graph(graph, unit_length, max_line_index)
@@ -77,7 +79,7 @@ def generate_music_signature_graph_for_point(graph, graph_size, margin, point):
 
 
 def generate_trajectory_of_fifths_graph_with_directed_axis(graph, graph_size, margin, cpms_table):
-    max_line_index = calculate_max_line_index(cpms_table)
+    max_line_index = calculate_max_line_index(cpms_table) if MAX_NUMBER_OF_LINES == 0 else MAX_NUMBER_OF_LINES
     unit_length = calculate_unit_length(graph_size, margin, max_line_index)
     generate_graph(graph, unit_length, max_line_index)
     main_axis_pitch_class = find_main_axis_trajectory(cpms_table)
@@ -86,7 +88,7 @@ def generate_trajectory_of_fifths_graph_with_directed_axis(graph, graph_size, ma
 
 
 def generate_trajectory_of_fifths_graph(graph, graph_size, margin, cpms_table):
-    max_line_index = calculate_max_line_index(cpms_table)
+    max_line_index = calculate_max_line_index(cpms_table) if MAX_NUMBER_OF_LINES == 0 else MAX_NUMBER_OF_LINES
     unit_length = calculate_unit_length(graph_size, margin, max_line_index)
     generate_graph(graph, unit_length, max_line_index)
 
