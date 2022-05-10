@@ -78,13 +78,22 @@ def generate_music_signature_graph_for_point(graph, graph_size, margin, point):
         graph.draw_line((0, 0), (x, y), color='blue', width=LINES_WIDTH)
 
 
-def generate_trajectory_of_fifths_graph_with_directed_axis(graph, graph_size, margin, cpms_table):
+def generate_trajectory_of_fifths_graph_with_directed_axis(graph, graph_size, margin, cpms_table, note_time_segments_array):
     max_line_index = calculate_max_line_index(cpms_table) if MAX_NUMBER_OF_LINES == 0 else MAX_NUMBER_OF_LINES
     unit_length = calculate_unit_length(graph_size, margin, max_line_index)
     generate_graph(graph, unit_length, max_line_index)
-    main_axis_pitch_class = find_main_axis_trajectory(cpms_table)
+    main_axis_pitch_class = find_main_axis_trajectory(note_time_segments_array)
     draw_main_directed_axis(graph, main_axis_pitch_class, unit_length, max_line_index)
     draw_mode_axis(graph, main_axis_pitch_class, unit_length, max_line_index)
+    # points and lines between them
+    for point in range(len(cpms_table)):
+        x = cpms_table[point][0] * unit_length
+        y = cpms_table[point][1] * unit_length
+        previous_x = cpms_table[point - 1][0] * unit_length
+        previous_y = cpms_table[point - 1][1] * unit_length
+        graph.draw_point((x, y), POINT_DIAMETER, color='blue')
+        if point != 0:
+            graph.draw_line((previous_x, previous_y), (x, y), color='blue', width=LINES_WIDTH)
 
 
 def generate_trajectory_of_fifths_graph(graph, graph_size, margin, cpms_table):

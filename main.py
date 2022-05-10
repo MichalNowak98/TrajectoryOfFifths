@@ -1,9 +1,10 @@
 from chart_display_module.chart_display import generate_trajectory_of_fifths_graph, \
+    generate_trajectory_of_fifths_graph_with_directed_axis, \
     generate_music_signature_graph_for_note_class_durations, \
     generate_music_signature_graph_for_note_class_durations_with_directed_axis
 import PySimpleGUI
 from midi_module.midi_analyzer import get_cpms_array_whole_file, get_cpms_array_quarter_notes, get_cpms_array_from_csv,\
-    get_note_time_segments_array_quarter_notes
+    get_note_time_segments_array_quarter_notes, get_cpms_array_and_note_time_segments_array_quarter_notes
 from layouts import ComparisonGraphLayout, GraphLayout
 
 
@@ -107,6 +108,14 @@ def show_trajectory_of_fifths(path):
     sustain_window(window)
 
 
+def show_trajectory_of_fifths_with_directed_axis(path):
+    graph_layout = GraphLayout(GRAPH_SIZE)
+    window = PySimpleGUI.Window('Trajectory of fifths', graph_layout.layout, finalize=True)
+    midi_cpms, note_time_segments_array = get_cpms_array_and_note_time_segments_array_quarter_notes(path, NUMBER_OF_CHUNKS)
+    generate_trajectory_of_fifths_graph_with_directed_axis(window[graph_layout.GRAPH_KEY], GRAPH_SIZE, MARGIN, midi_cpms, note_time_segments_array)
+    sustain_window(window)
+
+
 def show_trajectory_of_fifths_for_array(array):
     graph_layout = GraphLayout(GRAPH_SIZE)
     window = PySimpleGUI.Window('Trajectory of fifths', graph_layout.layout, finalize=True)
@@ -146,7 +155,8 @@ def sustain_window(window):
 if __name__ == '__main__':
     #show_music_signature()
     #show_trajectory_of_fifths_for_array(TRAJECTORY_TEST_ARRAYS[1])
-    show_music_signature_with_directed_axis()
+    #show_music_signature_with_directed_axis()
     #show_trajectory_of_fifths(PATHS[0] + TRACKS[0] + ".mid")
+    show_trajectory_of_fifths_with_directed_axis(PATHS[0] + TRACKS[0] + ".mid")
     #show_cpms_of_trajectory(PATHS[1] + TRACKS[1] + ".mid", 1)
     #show_comparison_of_trajectories()

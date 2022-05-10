@@ -99,12 +99,21 @@ def find_main_axis_signature(note_class_durations):
     return main_axe[1]
 
 
-def find_main_axis_trajectory(cpms_table):
-    main_axe = [0, 0]
-    for pitch_class in PitchClass:
-        axis = directed_axis_value_trajectory(pitch_class, cpms_table)
-        if axis > main_axe[0]:
-            main_axe = [axis, pitch_class]
+def find_main_axis_trajectory(note_class_duration_array):
+    note_class_duration_array_index = 0
+    note_class_durations = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    found_solution = False
+    while not found_solution:
+        main_axe = [0, 0]
+        for i in range(12):
+            note_class_durations[i] += note_class_duration_array[note_class_duration_array_index][PitchClass.class_for_index(i).name]
+        for pitch_class in PitchClass:
+            axis = directed_axis_value_signature(pitch_class, note_class_durations)
+            if axis > main_axe[0]:
+                main_axe = [axis, pitch_class]
+                found_solution = True
+            elif axis == main_axe[0]:
+                found_solution = False
     return main_axe[1]
 
 #TODO refactor - based on signatures, not cpms

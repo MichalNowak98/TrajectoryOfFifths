@@ -8,14 +8,23 @@ setlocale(LC_NUMERIC, 'French_Canada.1252')
 def get_cpms_array(note_time_segments_array, time_per_chunk, number_of_chunks):
     note_class_duration_array = get_note_class_duration_array(note_time_segments_array, time_per_chunk, number_of_chunks)
     cpms_array = calculate_cpms_array(note_class_duration_array)
-    return cpms_array
+    return cpms_array, note_class_duration_array
 
 
 def get_cpms_array_quarter_notes(name, number_of_chunks):
     mid = MidiFile(name, clip=True)
     print(mid)
     note_time_segments_array, time = get_note_time_segments_array_and_time(mid)
-    return get_cpms_array(note_time_segments_array, mid.ticks_per_beat, number_of_chunks)
+    cpms_array, note_class_duration_array = get_cpms_array(note_time_segments_array, mid.ticks_per_beat, number_of_chunks)
+    return cpms_array
+
+
+def get_cpms_array_and_note_time_segments_array_quarter_notes(name, number_of_chunks):
+    mid = MidiFile(name, clip=True)
+    print(mid)
+    note_time_segments_array, time = get_note_time_segments_array_and_time(mid)
+    cpms_array, note_class_duration_array = get_cpms_array(note_time_segments_array, mid.ticks_per_beat, number_of_chunks)
+    return cpms_array, note_class_duration_array
 
 
 def get_note_time_segments_array_quarter_notes(name, number_of_chunks):
