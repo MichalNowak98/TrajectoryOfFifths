@@ -107,6 +107,7 @@ def find_main_axis_trajectory(note_class_duration_array):
         main_axe = [0, 0]
         for i in range(12):
             note_class_durations[i] += note_class_duration_array[note_class_duration_array_index][PitchClass.class_for_index(i).name]
+        note_class_duration_array_index += 1
         for pitch_class in PitchClass:
             axis = directed_axis_value_signature(pitch_class, note_class_durations)
             if axis > main_axe[0]:
