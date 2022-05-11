@@ -18,7 +18,7 @@ class ComparisonGraphLayout:
 
 
 class GraphLayout:
-    GRAPH_KEY = 'graph'
+    GRAPH_KEY = '-graph-'
     layout = []
 
     def __init__(self, graph_size):
