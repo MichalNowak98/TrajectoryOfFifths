@@ -56,8 +56,8 @@ def calculate_coordinates(point_table, pitch_class):
     # x = point_table[pitch_class.name] * cos(pitch_class.angle())
     # y = point_table[pitch_class.name] * sin(pitch_class.angle())
 
-    x = point_table[pitch_class.value] * cos(pitch_class.angle())
-    y = point_table[pitch_class.value] * sin(pitch_class.angle())
+    x = point_table[pitch_class.name] * cos(pitch_class.angle())
+    y = point_table[pitch_class.name] * sin(pitch_class.angle())
     return x, y
 
 
@@ -101,12 +101,12 @@ def find_main_axis_signature(note_class_durations):
 
 def find_main_axis_trajectory(note_class_duration_array):
     note_class_duration_array_index = 0
-    note_class_durations = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    note_class_durations = {'A': 0, 'D': 0, 'G': 0, 'C': 0, 'F': 0, 'Bb': 0, 'Eb': 0, 'Ab': 0, 'Db': 0, 'Gb': 0, 'B': 0, 'E': 0}
     found_solution = False
     while not found_solution:
         main_axe = [0, 0]
-        for i in range(12):
-            note_class_durations[i] += note_class_duration_array[note_class_duration_array_index][PitchClass.class_for_index(i).name]
+        for pitch_class in PitchClass:
+            note_class_durations[pitch_class.name] += note_class_duration_array[note_class_duration_array_index][pitch_class.name]
         note_class_duration_array_index += 1
         for pitch_class in PitchClass:
             axis = directed_axis_value_signature(pitch_class, note_class_durations)

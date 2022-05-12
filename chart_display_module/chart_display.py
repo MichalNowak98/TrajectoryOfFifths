@@ -52,7 +52,7 @@ def generate_music_signature_graph_for_note_class_durations(graph, graph_size, m
 
     # vectors
     for pitch_class in PitchClass:
-        x, y = calculate_coordinates(pitch_class.angle(), unit_length, note_class_durations[pitch_class.value])
+        x, y = calculate_coordinates(pitch_class.angle(), unit_length, note_class_durations[pitch_class.name])
         if x != 0 or y != 0:
             graph.draw_point((x, y), 7, color='blue')
             graph.draw_line((0, 0), (x, y), color='blue', width=LINES_WIDTH)
