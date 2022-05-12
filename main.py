@@ -1,13 +1,4 @@
-from chart_display_module.chart_display import generate_trajectory_of_fifths_graph, \
-    generate_trajectory_of_fifths_graph_with_directed_axis, \
-    generate_music_signature_graph_for_note_class_durations, \
-    generate_music_signature_graph_for_note_class_durations_with_directed_axis
-import PySimpleGUI
-# from midi_module.midi_analyzer import get_cpms_array_whole_file, get_cpms_array_quarter_notes, get_cpms_array_from_csv,\
-#     get_note_time_segments_array_quarter_notes, get_cpms_array_and_note_time_segments_array_quarter_notes
-from layouts import ComparisonGraphLayout, GraphLayout
 from gui_module.gui import run_gui
-
 
 NUMBER_OF_CHUNKS = 32
 GRAPH_SIZE = 900
@@ -86,79 +77,5 @@ TRACKS = [
 ]
 CHOSEN_INDEX = 15
 
-#
-# def show_music_signature():
-#     graph_layout = GraphLayout(GRAPH_SIZE)
-#     window = PySimpleGUI.Window('Characteristic point of music signature', graph_layout.layout, finalize=True)
-#     generate_music_signature_graph_for_note_class_durations(window[graph_layout.GRAPH_KEY], GRAPH_SIZE, MARGIN, SIGNATURE_TEST_ARRAYS[CHOSEN_INDEX])
-#     sustain_window(window)
-#
-#
-# def show_music_signature_with_directed_axis():
-#     graph_layout = GraphLayout(GRAPH_SIZE)
-#     window = PySimpleGUI.Window('Characteristic point of music signature', graph_layout.layout, finalize=True)
-#     generate_music_signature_graph_for_note_class_durations_with_directed_axis(window[graph_layout.GRAPH_KEY], GRAPH_SIZE, MARGIN, SIGNATURE_TEST_ARRAYS[CHOSEN_INDEX])
-#     sustain_window(window)
-#
-#
-# def show_trajectory_of_fifths(path):
-#     graph_layout = GraphLayout(GRAPH_SIZE)
-#     window = PySimpleGUI.Window('Trajectory of fifths', graph_layout.layout, finalize=True)
-#     midi_cpms = get_cpms_array_quarter_notes(path, NUMBER_OF_CHUNKS)
-#     generate_trajectory_of_fifths_graph(window[graph_layout.GRAPH_KEY], GRAPH_SIZE, MARGIN, midi_cpms)
-#     sustain_window(window)
-#
-#
-# def show_trajectory_of_fifths_with_directed_axis(path):
-#     graph_layout = GraphLayout(GRAPH_SIZE)
-#     window = PySimpleGUI.Window('Trajectory of fifths', graph_layout.layout, finalize=True)
-#     midi_cpms, note_time_segments_array = get_cpms_array_and_note_time_segments_array_quarter_notes(path, NUMBER_OF_CHUNKS)
-#     generate_trajectory_of_fifths_graph_with_directed_axis(window[graph_layout.GRAPH_KEY], GRAPH_SIZE, MARGIN, midi_cpms, note_time_segments_array)
-#     sustain_window(window)
-#
-#
-# def show_trajectory_of_fifths_for_array(array):
-#     graph_layout = GraphLayout(GRAPH_SIZE)
-#     window = PySimpleGUI.Window('Trajectory of fifths', graph_layout.layout, finalize=True)
-#     generate_trajectory_of_fifths_graph(window[graph_layout.GRAPH_KEY], GRAPH_SIZE, MARGIN, array)
-#     sustain_window(window)
-#
-#
-# def show_cpms_of_trajectory(path, index):
-#     graph_layout = GraphLayout(GRAPH_SIZE)
-#     window = PySimpleGUI.Window('Comparison of trajectories of fifths', graph_layout.layout, finalize=True)
-#     note_time_segments = get_note_time_segments_array_quarter_notes(path, NUMBER_OF_CHUNKS)
-#     generate_music_signature_graph_for_note_class_durations(window[graph_layout.GRAPH_KEY], GRAPH_SIZE, MARGIN, note_time_segments[index])
-#     sustain_window(window)
-#
-#
-# def show_comparison_of_trajectories(track):
-#     graph_layout = ComparisonGraphLayout(GRAPH_SIZE)
-#     window = PySimpleGUI.Window('Comparison of trajectories of fifths', graph_layout.layout, finalize=True)
-#     midi_cpms = get_cpms_array_quarter_notes('d:/Studia/Magisterka/Trajektorie/MIDI/{}.mid'.format(track),
-#                                              NUMBER_OF_CHUNKS)
-#     csv_cpms = get_cpms_array_from_csv(
-#         'd:/Studia/Magisterka/Trajektorie/CPMS/{}_quarter_note_from-0-to-32_Trajektoria.csv'.format(track))
-#     generate_trajectory_of_fifths_graph(window[graph_layout.LEFT_GRAPH_KEY], GRAPH_SIZE, MARGIN, midi_cpms)
-#     generate_trajectory_of_fifths_graph(window[graph_layout.RIGHT_GRAPH_KEY], GRAPH_SIZE, MARGIN, csv_cpms)
-#     sustain_window(window)
-#
-#
-# def sustain_window(window):
-#     while True:
-#         event, values = window.read()
-#         print(event, values)
-#         if event == PySimpleGUI.WIN_CLOSED:
-#             break
-#     window.close()
-
-
 if __name__ == '__main__':
     run_gui()
-    #show_music_signature()
-    #show_trajectory_of_fifths_for_array(TRAJECTORY_TEST_ARRAYS[1])
-    #show_music_signature_with_directed_axis()
-    #show_trajectory_of_fifths(PATHS[0] + TRACKS[0] + ".mid")
-    #show_trajectory_of_fifths_with_directed_axis(PATHS[0] + TRACKS[0] + ".mid")
-    #show_cpms_of_trajectory(PATHS[1] + TRACKS[1] + ".mid", 1)
-    #show_comparison_of_trajectories()

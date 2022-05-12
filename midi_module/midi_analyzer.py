@@ -2,6 +2,7 @@ from mido import MidiFile
 from trajectory_of_fifths_module.calculations import get_note_class, calculate_cpms_array
 import csv
 from locale import atof, setlocale, LC_NUMERIC
+from math import ceil
 
 setlocale(LC_NUMERIC, 'French_Canada.1252')
 
@@ -22,6 +23,7 @@ class TrajectoryOfFifthsMidi:
     def calculate_cpms_array_quarter_notes(self, midi_path, number_of_chunks):
         mid = MidiFile(midi_path, clip=True)
         note_time_segments_array, time = self.__get_note_time_segments_array_and_time(mid)
+        number_of_chunks = min(number_of_chunks, ceil(time / mid.ticks_per_beat))
         self.__get_cpms_array(note_time_segments_array, mid.ticks_per_beat, number_of_chunks)
 
     def calculate_cpms_array_whole_file(self, midi_path, number_of_chunks):
@@ -42,7 +44,7 @@ class TrajectoryOfFifthsMidi:
         self.__cpms_array = calculate_cpms_array(self.__note_class_duration_array)
 
     def __get_note_time_segments_array_and_time(self, mid):
-        time = 0
+        track_time = 0
         notes_on = list()
         note_time_segments_array = {
             "A": [], "D": [], "G": [], "C": [], "F": [], "Bb": [], "Eb": [], "Ab": [], "Db": [], "Gb": [], "B": [], "E": []
@@ -67,7 +69,8 @@ class TrajectoryOfFifthsMidi:
                             note_time_segments_array[get_note_class(msg.note)].append((notes_on[note_index]["time"], time))
                             del notes_on[note_index]
                             break
-        return note_time_segments_array, time
+                track_time = max(track_time, time)
+        return note_time_segments_array, track_time
 
     def __get_note_class_duration_array(self, note_time_segments_array, time_per_chunk, number_of_chunks):
         note_class_duration_array = []
