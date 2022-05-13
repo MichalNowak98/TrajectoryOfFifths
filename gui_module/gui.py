@@ -1,158 +1,125 @@
 import PySimpleGUI as sg
-from layouts import ComparisonGraphLayout, GraphLayout
+from gui_module.layouts import Layouts
 from chart_display_module.chart_display import TrajectoryOfFifthsChart
 from midi_module.midi_analyzer import TrajectoryOfFifthsMidi
 
-GRAPH_SIZE = 900
-MARGIN = 250
-graph_layout = GraphLayout(GRAPH_SIZE)
 
-sg.theme("GreenMono")
+class Gui:
+    __graph_size = 0
+    __layout = []
+    __window = None
+    __trajectoryOfFifthsMidi = None
+    __chart = None
 
-option_buttons_layout = [
-
-    sg.Button(button_text='Generate trajectory of fifths', key='-generate_button-'),
-    sg.Text('', text_color='red', visible=False, key='-trajectory_validation_text-')
-
-]
-signature_options_layout = [
-    [
-        sg.Text('Index of music signature: '),
-        sg.InputText("", key='-signature_index-', size=(5, 110))
-    ],
-    [
-        sg.Button(button_text='Show music signature', key='-signature_button-')
-    ],
-    [
-        sg.Button(button_text='Show music signature with directed axis', key='-signature_axis_button-')
-    ],
-    [
-        sg.Text('', text_color='red', visible=False, key='-signature_validation_text-')
-    ]
-]
-signature_options_frame = [
-    sg.Frame('Signature options', signature_options_layout, key='-signature_options_frame-', vertical_alignment='top', visible=False)
-]
-open_file_layout = [
-    [
-        sg.Text("Choose a MIDI file: ")
-    ],
-    [
-        sg.FileBrowse(key='-fileBrowse-', file_types=(("MIDI files", "*.mid"),)),
-        sg.InputText("", key='-browse_path-')
-    ],
-    [
-        sg.Checkbox(text='Show Main Directed Axis and Mode Axis', default=True, key='-show_axes-')
-    ],
-    [
-        sg.Checkbox(text='Set number of circles', default=False, change_submits=True, key='-fix_lines-'),
-        sg.InputText("", key='-max_line_number-', size=(5, 110), visible=False)
-    ],
-    [
-        sg.Text('Number of fragments: '), sg.InputText(size=(34, 110), key='-number_of_fragments-')
-    ],
-    option_buttons_layout,
-    signature_options_frame,
-]
-
-layout = [
-    [
-        [sg.Frame('Options', open_file_layout, key='FRAME', vertical_alignment='top'),
-         sg.Frame('', graph_layout.layout, key='FRAME3', visible=True)]
-    ],
-]
-window = sg.Window('Trajectory of fifths generator', layout, size=(1400, 900), finalize=True)
-trajectory = TrajectoryOfFifthsMidi()
-chart = TrajectoryOfFifthsChart(window[graph_layout.GRAPH_KEY], GRAPH_SIZE, MARGIN)
-
-def run_gui():
-    while True:
-        event, values = window.read()
-        if event == sg.WINDOW_CLOSED:
-            break
-        elif event == '-generate_button-':
-            window['-graph-'].erase()
-            try:
-                number_of_fragments = int(values['-number_of_fragments-'])
+    def __init__(self, graph_size, margin):
+        self.__graph_size = graph_size
+        layouts = Layouts(self.__graph_size)
+        self.__layout = [
+            [
+                [sg.Frame('Options', layouts.options_layout, key='FRAME', vertical_alignment='top'),
+                 sg.Frame('', layouts.graph_layout, key='FRAME3', visible=True)]
+            ],
+        ]
+        self.__window = sg.Window('Trajectory of fifths generator', self.__layout, size=(1400, 900), finalize=True)
+        self.__trajectoryOfFifthsMidi = TrajectoryOfFifthsMidi()
+        self.__chart = TrajectoryOfFifthsChart(self.__window['-graph-'], self.__graph_size, margin)
+        while True:
+            event, values = self.__window.read()
+            if event == sg.WINDOW_CLOSED:
+                break
+            elif event == '-generate_button-':
+                self.__window['-graph-'].erase()
                 try:
-                    midi_path = values['-browse_path-']
-                    show_axes = values['-show_axes-']
-                    if midi_path == '':
-                        window.Element('-trajectory_validation_text-').update('Choose MIDI file', visible=True)
-                    else:
-                        window.Element('-trajectory_validation_text-').update(visible=False)
+                    number_of_fragments = int(values['-number_of_fragments-'])
+                    try:
+                        midi_path = values['-browse_path-']
+                        show_axes = values['-show_axes-']
+                        if midi_path == '':
+                            self.__window.Element('-trajectory_validation_text-').update('Choose MIDI file',
+                                                                                         visible=True)
+                        else:
+                            self.__window.Element('-trajectory_validation_text-').update(visible=False)
+                            number_of_lines = 0
+                            try:
+                                if values['-fix_lines-']:
+                                    number_of_lines = max(int(values['-max_line_number-']), 0)
+                                self.__show_trajectory_of_fifths_quarter_notes(midi_path, show_axes,
+                                                                               number_of_fragments, number_of_lines)
+                                self.__window.Element('-signature_options_frame-').update(visible=True)
+                            except ValueError:  # integer cast exception
+                                self.__window.Element('-trajectory_validation_text-').update(
+                                    'Incorrect number of circles', visible=True)
+                    except:
+                        self.__window.Element('-trajectory_validation_text-').update('Incorrect name of file',
+                                                                                     visible=True)
+                except ValueError:  # integer cast exception
+                    self.__window.Element('-trajectory_validation_text-').update('Incorrect number of fragments',
+                                                                                 visible=True)
+            elif event == '-signature_button-':
+                try:
+                    signature_index = int(values['-signature_index-'])
+                    maximum_index = len(self.__trajectoryOfFifthsMidi.get_note_class_duration_array())
+                    if 0 < signature_index <= maximum_index:
+                        self.__window['-graph-'].erase()
+                        self.__window.Element('-signature_validation_text-').update(visible=False)
                         number_of_lines = 0
                         try:
                             if values['-fix_lines-']:
                                 number_of_lines = max(int(values['-max_line_number-']), 0)
-                            show_trajectory_of_fifths_quarter_notes(midi_path, show_axes, number_of_fragments, number_of_lines)
-                            window.Element('-signature_options_frame-').update(visible=True)
+                            self.__show_music_signature_for_point(signature_index - 1, number_of_lines)
+                            self.__window.Element('-signature_options_frame-').update(visible=True)
                         except ValueError:  # integer cast exception
-                            window.Element('-trajectory_validation_text-').update('Incorrect number of circles', visible=True)
-                except:
-                    window.Element('-trajectory_validation_text-').update('Incorrect name of file', visible=True)
-            except ValueError:  # integer cast exception
-                window.Element('-trajectory_validation_text-').update('Incorrect number of fragments', visible=True)
-        elif event == '-signature_button-':
-            try:
-                signature_index = int(values['-signature_index-'])
-                maximum_index = len(trajectory.get_note_class_duration_array())
-                if 0 < signature_index <= maximum_index:
-                    window['-graph-'].erase()
-                    window.Element('-signature_validation_text-').update(visible=False)
-                    number_of_lines = 0
-                    try:
-                        if values['-fix_lines-']:
-                            number_of_lines = max(int(values['-max_line_number-']), 0)
-                        show_music_signature_for_point(signature_index - 1, number_of_lines)
-                        window.Element('-signature_options_frame-').update(visible=True)
-                    except ValueError:  # integer cast exception
-                        window.Element('-trajectory_validation_text-').update('Incorrect number of circles',
-                                                                              visible=True)
-                else:
-                    window.Element('-signature_validation_text-').update('Signature index range: 1 to {}'.format(maximum_index),
-                                                                         visible=True)
-            except ValueError:  # integer cast exception
-                window.Element('-signature_validation_text-').update('Type correct index of signature', visible=True)
-        elif event == '-signature_axis_button-':
-            try:
-                signature_index = int(values['-signature_index-'])
-                maximum_index = len(trajectory.get_note_class_duration_array())
-                if 0 < signature_index <= maximum_index:
-                    window['-graph-'].erase()
-                    window.Element('-signature_validation_text-').update(visible=False)
-                    number_of_lines = 0
-                    try:
-                        if values['-fix_lines-']:
-                            number_of_lines = max(int(values['-max_line_number-']), 0)
-                        show_music_signature_for_point_with_axis(signature_index - 1, number_of_lines)
-                        window.Element('-signature_options_frame-').update(visible=True)
-                    except ValueError:  # integer cast exception
-                        window.Element('-trajectory_validation_text-').update('Incorrect number of circles',
-                                                                              visible=True)
-                else:
-                    window.Element('-signature_validation_text-').update('Signature index range: 1 to {}'.format(maximum_index),
-                                                                         visible=True)
-            except ValueError:  # integer cast exception
-                window.Element('-signature_validation_text-').update('Type correct index of signature', visible=True)
-        elif event == '-fix_lines-':
-            window.Element('-max_line_number-').update(visible=values['-fix_lines-'])
-    window.close()
+                            self.__window.Element('-trajectory_validation_text-').update('Incorrect number of circles',
+                                                                                         visible=True)
+                    else:
+                        self.__window.Element('-signature_validation_text-').update(
+                            'Signature index range: 1 to {}'.format(maximum_index),
+                            visible=True)
+                except ValueError:  # integer cast exception
+                    self.__window.Element('-signature_validation_text-').update('Type correct index of signature',
+                                                                                visible=True)
+            elif event == '-signature_axis_button-':
+                try:
+                    signature_index = int(values['-signature_index-'])
+                    maximum_index = len(self.__trajectoryOfFifthsMidi.get_note_class_duration_array())
+                    if 0 < signature_index <= maximum_index:
+                        self.__window['-graph-'].erase()
+                        self.__window.Element('-signature_validation_text-').update(visible=False)
+                        number_of_lines = 0
+                        try:
+                            if values['-fix_lines-']:
+                                number_of_lines = max(int(values['-max_line_number-']), 0)
+                            self.__show_music_signature_for_point_with_axis(signature_index - 1, number_of_lines)
+                            self.__window.Element('-signature_options_frame-').update(visible=True)
+                        except ValueError:  # integer cast exception
+                            self.__window.Element('-trajectory_validation_text-').update('Incorrect number of circles',
+                                                                                         visible=True)
+                    else:
+                        self.__window.Element('-signature_validation_text-').update(
+                            'Signature index range: 1 to {}'.format(maximum_index),
+                            visible=True)
+                except ValueError:  # integer cast exception
+                    self.__window.Element('-signature_validation_text-').update('Type correct index of signature',
+                                                                                visible=True)
+            elif event == '-fix_lines-':
+                self.__window.Element('-max_line_number-').update(visible=values['-fix_lines-'])
+        self.__window.close()
 
+    def __show_trajectory_of_fifths_quarter_notes(self, midi_path, show_axes, number_of_fragments, number_of_lines):
+        self.__trajectoryOfFifthsMidi.calculate_cpms_array_quarter_notes(midi_path, number_of_fragments)
+        if show_axes:
+            self.__chart.generate_trajectory_of_fifths_graph_with_directed_axis(
+                self.__trajectoryOfFifthsMidi.get_cpms_array(),
+                self.__trajectoryOfFifthsMidi.get_note_class_duration_array(),
+                number_of_lines)
+        else:
+            self.__chart.generate_trajectory_of_fifths_graph(self.__trajectoryOfFifthsMidi.get_cpms_array(),
+                                                             number_of_lines)
 
-def show_trajectory_of_fifths_quarter_notes(midi_path, show_axes, number_of_fragments, number_of_lines):
-    trajectory.calculate_cpms_array_quarter_notes(midi_path, number_of_fragments)
-    if show_axes:
-        chart.generate_trajectory_of_fifths_graph_with_directed_axis(trajectory.get_cpms_array(),
-                                                                     trajectory.get_note_class_duration_array(),
-                                                                     number_of_lines)
-    else:
-        chart.generate_trajectory_of_fifths_graph(trajectory.get_cpms_array(), number_of_lines)
+    def __show_music_signature_for_point(self, point_index, number_of_lines):
+        self.__chart.generate_music_signature_graph_for_note_class_durations(
+            self.__trajectoryOfFifthsMidi.get_note_class_durations(point_index), number_of_lines)
 
-
-def show_music_signature_for_point(point_index, number_of_lines):
-    chart.generate_music_signature_graph_for_note_class_durations(trajectory.get_note_class_durations(point_index), number_of_lines)
-
-
-def show_music_signature_for_point_with_axis(point_index, number_of_lines):
-    chart.generate_music_signature_graph_for_note_class_durations_with_directed_axis(trajectory.get_note_class_durations(point_index), number_of_lines)
+    def __show_music_signature_for_point_with_axis(self, point_index, number_of_lines):
+        self.__chart.generate_music_signature_graph_for_note_class_durations_with_directed_axis(
+            self.__trajectoryOfFifthsMidi.get_note_class_durations(point_index), number_of_lines)

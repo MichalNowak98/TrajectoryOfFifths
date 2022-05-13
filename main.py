@@ -1,4 +1,4 @@
-from gui_module.gui import run_gui
+from gui_module.gui import Gui
 
 NUMBER_OF_CHUNKS = 32
 GRAPH_SIZE = 900
@@ -78,4 +78,4 @@ TRACKS = [
 CHOSEN_INDEX = 15
 
 if __name__ == '__main__':
-    run_gui()
+    gui = Gui(GRAPH_SIZE, MARGIN)
