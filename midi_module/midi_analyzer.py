@@ -1,10 +1,13 @@
 from mido import MidiFile
-from trajectory_of_fifths_module.calculations import get_note_class, calculate_cpms_array
+from trajectory_of_fifths_module.calculations import calculate_cpms_array
 import csv
 from locale import atof, setlocale, LC_NUMERIC
 from math import ceil
 
 setlocale(LC_NUMERIC, 'French_Canada.1252')
+MIDI_NOTE_CLASS = {
+    0: "C", 1: "Db", 2: "D", 3: "Eb", 4: "E", 5: "F", 6: "Gb", 7: "G", 8: "Ab", 9: "A", 10: "Bb", 11: "B"
+}
 
 
 class TrajectoryOfFifthsMidi:
@@ -66,7 +69,7 @@ class TrajectoryOfFifthsMidi:
                 elif msg.type == 'note_off' or msg.type == 'note_on' and msg.velocity == 0:
                     for note_index in range(len(notes_on)):
                         if notes_on[note_index]["note"] == msg.note and notes_on[note_index]["channel"] == msg.channel:
-                            note_time_segments_array[get_note_class(msg.note)].append((notes_on[note_index]["time"], time))
+                            note_time_segments_array[self.__get_note_class(msg.note)].append((notes_on[note_index]["time"], time))
                             del notes_on[note_index]
                             break
                 track_time = max(track_time, time)
@@ -103,3 +106,7 @@ class TrajectoryOfFifthsMidi:
                     return time_segment[1] - time_segment[0]
             else:
                 return 0
+
+    @staticmethod
+    def __get_note_class(note):
+        return MIDI_NOTE_CLASS[note % 12]
