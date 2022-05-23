@@ -1,14 +1,14 @@
-from math import sin, cos, pi, ceil, sqrt, pow, acos
+from math import sin, cos, pi, floor, sqrt, pow, acos
 from enum import Enum
 
 # 30 degrees equals ~0.524 in radians
 ANGLE_BETWEEN_AXES = pi / 6
-#♭
+#"G♭/F♯", "e♭/d♯"
 CIRCLE_DUR_LABELS = [
-    "A", "D", "G", "C", "F", "B♭", "Eb", "A♭", "D♭", "G♭/F♯", "B", "E"
+    "A", "D", "G", "C", "F", "B♭", "Eb", "A♭", "D♭", "F♯", "B", "E"
 ]
 CIRCLE_MOLL_LABELS = [
-    "f#", "b", "e", "a", "d", "g", "c", "f", "bb", "eb/d#", "g#", "c#"
+    "f♯", "b", "e", "a", "d", "g", "c", "f", "b♭", "e♭", "g♯", "c♯"
 ]
 
 
@@ -73,10 +73,16 @@ def normalize_note_class_array(note_class_durations):
 
 def find_main_axis_signature(note_class_durations):
     main_axe = [0, 0]
+    several_results = False
     for pitch_class in PitchClass:
         axis = directed_axis_value_signature(pitch_class, note_class_durations)
         if axis > main_axe[0]:
+            several_results = False
             main_axe = [axis, pitch_class]
+        elif axis == main_axe[0]:
+            several_results = True
+    if several_results:
+        return None
     return main_axe[1]
 
 
@@ -122,3 +128,24 @@ def angle_between_vector_and_x_axis(x, y):
     if y < 0:
         angle = pi + pi - angle
     return angle
+
+
+def calculate_points_count_between_vectors(cpms_table):
+    # A-D, D-G, G-C and so on
+    points_count_between_vectors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    for point in cpms_table:
+        angle = angle_between_vector_and_x_axis(point[0], point[1])
+        index = floor(angle / ANGLE_BETWEEN_AXES)
+        if index == 12:
+            index = 11
+        points_count_between_vectors[index] += 1
+    return points_count_between_vectors
+
+
+def calculate_quarter_point_counts(points_count_between_vectors, main_axis_pitch_class):
+    # dur, moll
+    quarter_point_counts = [0, 0]
+    for i in range(1, 4):
+        quarter_point_counts[0] += points_count_between_vectors[main_axis_pitch_class.value - i]
+        quarter_point_counts[1] += points_count_between_vectors[main_axis_pitch_class.value - i - 3]
+    return quarter_point_counts

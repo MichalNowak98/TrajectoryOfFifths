@@ -1,6 +1,7 @@
 from mido import MidiFile
-from trajectory_of_fifths_module.calculations import calculate_cpms_array
-import csv
+from trajectory_of_fifths_module.calculations import calculate_cpms_array, calculate_points_count_between_vectors, \
+calculate_quarter_point_counts, find_main_axis_trajectory, CIRCLE_DUR_LABELS, CIRCLE_MOLL_LABELS, PitchClass
+import csv, os
 from locale import atof, setlocale, LC_NUMERIC
 from math import ceil
 
@@ -13,6 +14,10 @@ MIDI_NOTE_CLASS = {
 class TrajectoryOfFifthsMidi:
     __cpms_array = []
     __note_class_duration_array = []
+    __points_count_between_vectors = []
+    __quarter_point_counts = []
+    __main_axis_pitch_class = None
+    __track_name = ""
 
     def get_cpms_array(self):
         return self.__cpms_array
@@ -23,23 +28,94 @@ class TrajectoryOfFifthsMidi:
     def get_note_class_durations(self, index):
         return self.__note_class_duration_array[index]
 
+    def get_points_count_between_vectors(self):
+        return self.__points_count_between_vectors
+
+    def get_quarter_point_counts(self):
+        return self.__quarter_point_counts
+
+    def get_main_axis_pitch_class(self):
+        return self.__main_axis_pitch_class
+
+    def get_signature_key_label(self):
+        if self.__main_axis_pitch_class.value is None:
+            return None
+        if self.__quarter_point_counts[0] > self.__quarter_point_counts[1]:
+            return CIRCLE_DUR_LABELS[PitchClass.class_for_index(self.__main_axis_pitch_class.value - 1).value]
+        else:
+            return CIRCLE_MOLL_LABELS[PitchClass.class_for_index(self.__main_axis_pitch_class.value - 1).value]
+
+    def calculate_cpms_array_whole_notes(self, midi_path, number_of_chunks):
+        mid = MidiFile(midi_path, clip=True)
+        self.__save_track_name(mid)
+        note_time_segments_array, time = self.__get_note_time_segments_array_and_time(mid)
+        number_of_chunks = min(number_of_chunks, ceil(time / mid.ticks_per_beat))
+        self.__get_cpms_array(note_time_segments_array, mid.ticks_per_beat * 4, number_of_chunks)
+        self.__points_count_between_vectors = calculate_points_count_between_vectors(self.__cpms_array)
+        self.__main_axis_pitch_class = find_main_axis_trajectory(self.__note_class_duration_array)
+        self.__quarter_point_counts = calculate_quarter_point_counts(self.__points_count_between_vectors, self.__main_axis_pitch_class)
+
+    def calculate_cpms_array_half_notes(self, midi_path, number_of_chunks):
+        mid = MidiFile(midi_path, clip=True)
+        self.__save_track_name(mid)
+        note_time_segments_array, time = self.__get_note_time_segments_array_and_time(mid)
+        number_of_chunks = min(number_of_chunks, ceil(time / mid.ticks_per_beat))
+        self.__get_cpms_array(note_time_segments_array, mid.ticks_per_beat * 2, number_of_chunks)
+        self.__points_count_between_vectors = calculate_points_count_between_vectors(self.__cpms_array)
+        self.__main_axis_pitch_class = find_main_axis_trajectory(self.__note_class_duration_array)
+        self.__quarter_point_counts = calculate_quarter_point_counts(self.__points_count_between_vectors, self.__main_axis_pitch_class)
+
     def calculate_cpms_array_quarter_notes(self, midi_path, number_of_chunks):
         mid = MidiFile(midi_path, clip=True)
+        self.__save_track_name(mid)
         note_time_segments_array, time = self.__get_note_time_segments_array_and_time(mid)
         number_of_chunks = min(number_of_chunks, ceil(time / mid.ticks_per_beat))
         self.__get_cpms_array(note_time_segments_array, mid.ticks_per_beat, number_of_chunks)
+        self.__points_count_between_vectors = calculate_points_count_between_vectors(self.__cpms_array)
+        self.__main_axis_pitch_class = find_main_axis_trajectory(self.__note_class_duration_array)
+        self.__quarter_point_counts = calculate_quarter_point_counts(self.__points_count_between_vectors, self.__main_axis_pitch_class)
+        self.save_data_to_csv()
 
-    def calculate_cpms_array_whole_file(self, midi_path, number_of_chunks):
+    def calculate_cpms_array_quaver_notes(self, midi_path, number_of_chunks):
         mid = MidiFile(midi_path, clip=True)
+        self.__save_track_name(mid)
         note_time_segments_array, time = self.__get_note_time_segments_array_and_time(mid)
-        time_per_chunk = float(time) / number_of_chunks
-        self.__get_cpms_array(note_time_segments_array, time_per_chunk, number_of_chunks)
+        number_of_chunks = min(number_of_chunks, ceil(time / mid.ticks_per_beat))
+        self.__get_cpms_array(note_time_segments_array, mid.ticks_per_beat/2, number_of_chunks)
+        self.__points_count_between_vectors = calculate_points_count_between_vectors(self.__cpms_array)
+        self.__main_axis_pitch_class = find_main_axis_trajectory(self.__note_class_duration_array)
+        self.__quarter_point_counts = calculate_quarter_point_counts(self.__points_count_between_vectors, self.__main_axis_pitch_class)
+
+    def calculate_cpms_array_semiquaver_notes(self, midi_path, number_of_chunks):
+        mid = MidiFile(midi_path, clip=True)
+        self.__save_track_name(mid)
+        note_time_segments_array, time = self.__get_note_time_segments_array_and_time(mid)
+        number_of_chunks = min(number_of_chunks, ceil(time / mid.ticks_per_beat))
+        self.__get_cpms_array(note_time_segments_array, mid.ticks_per_beat/4, number_of_chunks)
+        self.__points_count_between_vectors = calculate_points_count_between_vectors(self.__cpms_array)
+        self.__main_axis_pitch_class = find_main_axis_trajectory(self.__note_class_duration_array)
+        self.__quarter_point_counts = calculate_quarter_point_counts(self.__points_count_between_vectors, self.__main_axis_pitch_class)
 
     def calculate_cpms_array_from_csv(self, csv_path):
         with open(csv_path) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=';')
             for row in csv_reader:
                 self.__cpms_array.append((atof(row[0]), atof(row[1])))
+
+    def save_data_to_csv(self):
+        with open('trajectory_data.csv', mode='a') as csv_file:
+            fieldnames = ['trajectory signature', 'dur/moll points ratio']
+            csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames, delimiter=';')
+
+            if self.__quarter_point_counts[1] > 0:
+                ratio = float(self.__quarter_point_counts[0]) / float(self.__quarter_point_counts[1])
+
+            csv_writer.writeheader()
+            csv_writer.writerow({'trajectory signature' :self.get_signature_key_label(), 'dur/moll points ratio': ratio})
+
+    def __save_track_name(self, mid):
+        track_name, extension = os.path.splitext(os.path.basename(mid.filename))
+        self.__track_name = track_name
 
     def __get_cpms_array(self, note_time_segments_array, time_per_chunk, number_of_chunks):
         self.__note_class_duration_array = self.__get_note_class_duration_array(note_time_segments_array, time_per_chunk,
