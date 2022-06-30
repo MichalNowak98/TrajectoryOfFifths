@@ -1,6 +1,7 @@
 from mido import MidiFile
 from trajectory_of_fifths_module.calculations import calculate_cpms_array, calculate_points_count_between_vectors, \
-calculate_quarter_point_counts, find_main_axis_trajectory, CIRCLE_DUR_LABELS, CIRCLE_MOLL_LABELS, PitchClass
+    calculate_quarter_point_counts, find_main_axis_trajectory, CIRCLE_DUR_LABELS, CIRCLE_MOLL_LABELS, \
+    CIRCLE_DUR_LABELS_UTF8, CIRCLE_MOLL_LABELS_UTF8, PitchClass
 import csv, os
 from locale import atof, setlocale, LC_NUMERIC
 from math import ceil
@@ -37,6 +38,9 @@ class TrajectoryOfFifthsMidi:
     def get_main_axis_pitch_class(self):
         return self.__main_axis_pitch_class
 
+    def get_track_name(self):
+        return self.__track_name
+
     def get_signature_key_label(self):
         if self.__main_axis_pitch_class.value is None:
             return None
@@ -44,6 +48,14 @@ class TrajectoryOfFifthsMidi:
             return CIRCLE_DUR_LABELS[PitchClass.class_for_index(self.__main_axis_pitch_class.value - 1).value]
         else:
             return CIRCLE_MOLL_LABELS[PitchClass.class_for_index(self.__main_axis_pitch_class.value - 1).value]
+
+    def get_signature_key_label_utf8(self):
+        if self.__main_axis_pitch_class.value is None:
+            return None
+        if self.__quarter_point_counts[0] > self.__quarter_point_counts[1]:
+            return CIRCLE_DUR_LABELS_UTF8[PitchClass.class_for_index(self.__main_axis_pitch_class.value - 1).value]
+        else:
+            return CIRCLE_MOLL_LABELS_UTF8[PitchClass.class_for_index(self.__main_axis_pitch_class.value - 1).value]
 
     def calculate_cpms_array_whole_notes(self, midi_path, number_of_chunks):
         mid = MidiFile(midi_path, clip=True)
@@ -74,7 +86,6 @@ class TrajectoryOfFifthsMidi:
         self.__points_count_between_vectors = calculate_points_count_between_vectors(self.__cpms_array)
         self.__main_axis_pitch_class = find_main_axis_trajectory(self.__note_class_duration_array)
         self.__quarter_point_counts = calculate_quarter_point_counts(self.__points_count_between_vectors, self.__main_axis_pitch_class)
-        self.save_data_to_csv()
 
     def calculate_cpms_array_quaver_notes(self, midi_path, number_of_chunks):
         mid = MidiFile(midi_path, clip=True)
@@ -102,16 +113,7 @@ class TrajectoryOfFifthsMidi:
             for row in csv_reader:
                 self.__cpms_array.append((atof(row[0]), atof(row[1])))
 
-    def save_data_to_csv(self):
-        with open('trajectory_data.csv', mode='a') as csv_file:
-            fieldnames = ['trajectory signature', 'dur/moll points ratio']
-            csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames, delimiter=';')
 
-            if self.__quarter_point_counts[1] > 0:
-                ratio = float(self.__quarter_point_counts[0]) / float(self.__quarter_point_counts[1])
-
-            csv_writer.writeheader()
-            csv_writer.writerow({'trajectory signature' :self.get_signature_key_label(), 'dur/moll points ratio': ratio})
 
     def __save_track_name(self, mid):
         track_name, extension = os.path.splitext(os.path.basename(mid.filename))

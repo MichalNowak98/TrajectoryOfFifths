@@ -40,9 +40,6 @@ class Layouts:
                 sg.Button(button_text='Next', key='-next_signature-'),
             ],
             self.__key_layout,
-            [
-                sg.Button(button_text='Generate .csv file', key='-csv_file-'),
-            ],
         ]
         self.__signature_options_frame = [
             sg.Frame('Signature options', self.__signature_options_layout, key='-signature_options_frame-',
@@ -64,7 +61,7 @@ class Layouts:
                 sg.InputText("", key='-max_line_number-', size=(5, 110), visible=False)
             ],
             [
-                sg.Text('Number of fragments: '), sg.InputText(size=(34, 110), key='-number_of_fragments-')
+                sg.Text('Number of samples: '), sg.InputText(size=(34, 110), key='-number_of_samples-')
             ],
             [
                 sg.Text('Generate trajectory of fifths: '),
@@ -93,4 +90,7 @@ class Layouts:
                 sg.Text('', text_color='red', visible=False, key='-trajectory_validation_text-')
             ],
             self.__signature_options_frame,
+            [
+                sg.Button(button_text='Generate .csv file', key='-csv_file-'),
+            ],
         ]

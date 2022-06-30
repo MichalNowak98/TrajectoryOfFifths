@@ -10,6 +10,12 @@ CIRCLE_DUR_LABELS = [
 CIRCLE_MOLL_LABELS = [
     "f♯", "b", "e", "a", "d", "g", "c", "f", "b♭", "e♭", "g♯", "c♯"
 ]
+CIRCLE_DUR_LABELS_UTF8 = [
+    "A", "D", "G", "C", "F", "Bb", "Eb", "Ab", "Db", "F#", "B", "E"
+]
+CIRCLE_MOLL_LABELS_UTF8 = [
+    "f#", "b", "e", "a", "d", "g", "c", "f", "bb", "eb", "g#", "c#"
+]
 
 
 class PitchClass(Enum):
@@ -124,6 +130,8 @@ def calculate_vector_length(x, y):
 
 
 def angle_between_vector_and_x_axis(x, y):
+    if x == 0 and y == 0:
+        return 0
     angle = acos((x * 1 + y * 0)/(sqrt(x * x + y * y) * sqrt(1 * 1 + 0 * 0)))
     if y < 0:
         angle = pi + pi - angle
